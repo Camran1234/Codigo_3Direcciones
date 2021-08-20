@@ -1,0 +1,94 @@
+package camran.codigo_3direcciones_ejemplo.parser;
+import camran.codigo_3direcciones_ejemplo.clases.Operador;
+import java.util.ArrayList;
+parser code {:
+ ArrayList<Operador> list = new ArrayList();
+:}
+
+terminal SUMA, RESTA, MULT, DIV, COLON, NUMERO, SIMBOLO, EQUAL, OPEN_PARENTHESIS, CLOSE_PARENTHESIS;
+
+non terminal main_body;
+non terminal Operador value, operation;
+
+/*PRECEDENCE*/
+precedence left SUMA, RESTA;
+precedence left DIV, MULT;
+precedence left OPEN_PARENTHESIS, CLOSE_PARENTHESIS;
+
+start with main_body;
+
+
+main_body ::= operation:op main_body
+    |/*empty*/
+    ;
+
+operation ::= SIMBOLO:sim EQUAL value:val COLON{:
+                Operador operador = new Operador(sim.toString(), val.getValue());
+                System.out.println(sim.toString()+"="+operador.getMessage());
+            :}
+            ;
+
+value ::= NUMERO:num {: 
+        Operador operador = new Operador("",num.toString());
+        RESULT = operador;
+    :}
+    |SIMBOLO:num{: 
+        Operador operador = new Operador("",num.toString());
+        RESULT = operador;
+    :}
+    |RESTA NUMERO:num{: 
+        Operador operador = new Operador();
+        operador.setValue(num.toString());
+        operador.setUnitary(true);
+        System.out.println(operador.getMessage());
+        list.add(operador);
+        RESULT = operador;
+    :}
+    |RESTA SIMBOLO:num{: 
+        Operador operador = new Operador();
+        operador.setValue(num.toString());
+        operador.setUnitary(true);
+        System.out.println(operador.getMessage());
+        list.add(operador);
+        RESULT = operador;
+    :}
+    |OPEN_PARENTHESIS value:e1 CLOSE_PARENTHESIS{:
+        RESULT = e1;
+    :}
+    |value:e1 SUMA value:e2{:
+        Operador operador = new Operador();
+        operador.setOperador("+");
+        operador.setLeftValue(e1.getValue());
+        operador.setRightValue(e2.getValue());
+        list.add(operador);
+        System.out.println(operador.getMessage());
+        RESULT = operador;
+    :}
+    |value:e1 RESTA value:e2{:
+        Operador operador = new Operador();
+        operador.setOperador("-");
+        operador.setLeftValue(e1.getValue());
+        operador.setRightValue(e2.getValue());
+        list.add(operador);
+        System.out.println(operador.getMessage());
+        RESULT = operador;
+    :}
+    |value:e1 MULT value:e2{:
+        Operador operador = new Operador();
+        operador.setOperador("*");
+        operador.setLeftValue(e1.getValue());
+        operador.setRightValue(e2.getValue());
+        list.add(operador);
+        System.out.println(operador.getMessage());
+        RESULT = operador;
+    :}
+    |value:e1 DIV value:e2{:
+        Operador operador = new Operador();
+        operador.setOperador("/");
+        operador.setLeftValue(e1.getValue());
+        operador.setRightValue(e2.getValue());
+        list.add(operador);
+        System.out.println(operador.getMessage());
+        RESULT = operador;
+    :}
+    ;
